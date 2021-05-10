@@ -1,13 +1,19 @@
 const kaltura = require('kaltura-client');
+// Kaltura
 const config = new kaltura.Configuration();
 config.serviceUrl = 'https://www.kaltura.com';
 const client = new kaltura.Client(config);
 
-let idList = ["0_lzwa9iqb", "1_lg4czjhh", "1_qoumt81r", "1_wsj72tc3"];
+// Sheets
+const { GoogleSpreadsheet } = require('google-spreadsheet');
+const { promisify } = require('util')
+const creds = require('./client_secret.json');
+
+let idList = [];
 let list = [];
 let resultStore;
 
-listCaptionFinder(idList);
+accessSpreadsheet();
 
 function listCaptionFinder(listOfIds) {
     for (let i = 0; i < listOfIds.length; i++) {
@@ -68,9 +74,29 @@ function hasCaptionsPromise(id) {
             })
             .execute(client);
     })
-
-
-
-
     // one with captions: 0_lzwa9iqb
+}
+
+async function accessSpreadsheet() {
+    const doc = new GoogleSpreadsheet('1k22ZS17H9xcbmFZagpCPWEMEtQ9sPnyrUeMIt9DvExI');
+    await doc.useServiceAccountAuth(creds);
+    const info = await doc.getInfo();
+    const sheet = await doc.sheetsByIndex[0];
+    // console.log(`Title: ${sheet.title}, Rows: ${sheet.rowCount}`);
+
+    const rows = await sheet.getRows({
+        offset: 0
+    });
+
+    rows.forEach(row => {
+        getRow(row);
+    })
+
+    console.log(idList);
+
+    listCaptionFinder(idList);
+}
+
+function getRow(row) {
+    idList.push(row.id);
 }
