@@ -18,14 +18,12 @@ accessSpreadsheet();
 function listCaptionFinder(listOfIds) {
     for (let i = 0; i < listOfIds.length; i++) {
         hasCaptionsPromise(listOfIds[i]).then((message) => {
-            console.log("resolve for " + listOfIds[i]);
             list.push({
                 id: message,
                 captions: true
             });
             console.log(list);
         }).catch((message) => {
-            console.log("reject for " + listOfIds[i]);
             list.push({
                 id: message,
                 captions: false
@@ -91,8 +89,6 @@ async function accessSpreadsheet() {
     rows.forEach(row => {
         getRow(row);
     })
-
-    console.log(idList);
 
     listCaptionFinder(idList);
 }
