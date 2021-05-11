@@ -32,8 +32,9 @@ function accessThenCaptions() {
             rows[i].query = list[i].id;
             rows[i].result = list[i].captions;
             rows[i].save();
-            console.log(list);
             i++;
+
+            // console.log(list);
         }).catch((message) => {
             list.push({
                 id: message,
@@ -42,15 +43,18 @@ function accessThenCaptions() {
             rows[i].query = list[i].id;
             rows[i].result = list[i].captions;
             rows[i].save();
-            console.log(list);
             i++;
+
+            //console.log(list);
         });
     }).catch(() => {
-        console.error("Error??")
+        console.error("Error??");
     });
 }
 
-setInterval(accessThenCaptions, 3000);
+setInterval(accessThenCaptions, 2000);
+
+
 
 function hasCaptionsPromise(id) {
     return new Promise((resolve, reject) => {
