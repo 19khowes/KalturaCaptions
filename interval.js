@@ -21,6 +21,7 @@ let idList = [];
 let list = [];
 let i = 0;
 let rows;
+let count;
 
 function accessThenCaptions() {
     accessSpreadsheet().then(() => {
@@ -33,7 +34,11 @@ function accessThenCaptions() {
             rows[i].result = list[i].captions;
             rows[i].save();
             i++;
-
+            console.log(i);
+            console.log(count - 1);
+            if (i == count - 1) {
+                clearInterval(intervalID);
+            }
             // console.log(list);
         }).catch((message) => {
             list.push({
@@ -45,14 +50,20 @@ function accessThenCaptions() {
             rows[i].save();
             i++;
 
+            console.log(i);
+            console.log(count - 1);
+            if (i == count - 1) {
+                clearInterval(intervalID);
+            }
             //console.log(list);
         });
     }).catch(() => {
         console.error("Error??");
     });
+    
 }
 
-setInterval(accessThenCaptions, 2000);
+let intervalID = setInterval(accessThenCaptions, 2000);
 
 
 
@@ -106,6 +117,8 @@ async function accessSpreadsheet() {
     rows = await sheet.getRows({
         offset: 0
     });
+
+    count = sheet.rowCount;
 
     rows.forEach(row => {
         idList.push(row.id);
