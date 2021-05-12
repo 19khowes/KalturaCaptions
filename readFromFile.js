@@ -26,10 +26,12 @@ async function accessRows() {
 }
 
 accessRows().then(() => {
-    readJSONFile("output.txt", function(callBackData) {
+    readJSONFile("output.txt", function (callBackData) {
         data = JSON.parse(callBackData);
     });
-    setInterval(writeRows, 1000);
+    setTimeout(() => {
+        setInterval(writeRows, 1000);
+    }, 5000)
 }).catch((err) => {
     console.log(err);
 });
