@@ -1,30 +1,53 @@
-const { GoogleSpreadsheet } = require('google-spreadsheet');
-const { promisify } = require('util')
+const {
+    GoogleSpreadsheet
+} = require('google-spreadsheet');
+const {
+    promisify
+} = require('util');
+const fs = require('fs');
 
 const creds = require('./client_secret.json');
 
+let rows;
 let list = [];
+let i = 0;
+let data;
 
-function getRow(row) {
-    list.push(row.id);
-}
-
-async function accessSpreadsheet() {
+async function accessRows() {
     const doc = new GoogleSpreadsheet('1k22ZS17H9xcbmFZagpCPWEMEtQ9sPnyrUeMIt9DvExI');
     await doc.useServiceAccountAuth(creds);
     const info = await doc.getInfo();
     const sheet = await doc.sheetsByIndex[0];
     // console.log(`Title: ${sheet.title}, Rows: ${sheet.rowCount}`);
 
-    const rows = await sheet.getRows({
+    rows = await sheet.getRows({
         offset: 0
     });
-
-    rows.forEach(row => {
-        getRow(row);
-    })
-
-    console.log(list);
 }
 
-accessSpreadsheet();
+accessRows().then(() => {
+    readJSONFile("output.txt", function(callBackData) {
+        data = JSON.parse(callBackData);
+    });
+    setInterval(writeRows, 1000);
+}).catch((err) => {
+    console.log(err);
+});
+
+
+function writeRows() {
+    console.log(data);
+    rows[i].query = data[i].id;
+    rows[i].save();
+
+    rows[i].result = data[i].captions;
+    rows[i].save();
+
+    i++;
+}
+
+function readJSONFile(filePath, callback) {
+    fs.readFile(filePath, function (err, callbackData) {
+        callback(callbackData);
+    })
+}

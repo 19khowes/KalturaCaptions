@@ -26,14 +26,14 @@ function listCaptionFinder(listOfIds) {
                 captions: true
             });
             fs.writeFile("output.txt", JSON.stringify(list), () => {});
-            console.log(list);
+            //console.log(list);
         }).catch((message) => {
             list.push({
                 id: message,
                 captions: false
             });
             fs.writeFile("output.txt", JSON.stringify(list), () => {});
-            console.log(list);
+            //console.log(list);
         });
     }
 }
