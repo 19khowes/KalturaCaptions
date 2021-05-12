@@ -12,6 +12,7 @@ let rows;
 let list = [];
 let i = 0;
 let data;
+let clear;
 
 async function accessRows() {
     const doc = new GoogleSpreadsheet('1k22ZS17H9xcbmFZagpCPWEMEtQ9sPnyrUeMIt9DvExI');
@@ -30,7 +31,7 @@ accessRows().then(() => {
         data = JSON.parse(callBackData);
     });
     setTimeout(() => {
-        setInterval(writeRows, 1000);
+        clear = setInterval(writeRows, 2000);
     }, 5000)
 }).catch((err) => {
     console.log(err);
@@ -40,10 +41,14 @@ accessRows().then(() => {
 function writeRows() {
     console.log(data);
     rows[i].query = data[i].id;
-    rows[i].save();
+    rows[i].save().catch(() => {
+        clearInterval(clear);
+    });
 
     rows[i].result = data[i].captions;
-    rows[i].save();
+    rows[i].save().catch(() => {
+        clearInterval(clear);        
+    });
 
     i++;
 }
