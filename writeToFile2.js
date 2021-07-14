@@ -18,13 +18,13 @@ accessSpreadsheet().then(() => {
     console.log("finished");
 });
 
-function listCaptionFinder(listOfIds) {
+async function listCaptionFinder(listOfIds) {
+    const delay = ms => new Promise(res => setTimeout(res, ms));
     let promiseArray = [];
 
     for (ID of listOfIds) {
-        setTimeout(() => {
-            promiseArray.push(hasCaptionsPromise(ID));
-        }, 1000);
+        await delay(50);
+        promiseArray.push(hasCaptionsPromise(ID));
     }
 
     // for (ID of listOfIds) {
@@ -32,6 +32,7 @@ function listCaptionFinder(listOfIds) {
     // }
 
     Promise.all(promiseArray).then((values) => {
+        console.log(values);
         // Take list of returned objects and convert to string
         let stringToWrite = JSON.stringify(values);
         // Add a bit of formatting to match JSON format
@@ -44,7 +45,7 @@ function listCaptionFinder(listOfIds) {
         fs.writeFile("output.txt", stringToWrite, () => {});
         */
     }).catch((error) => {
-        console.log(error);
+        console.log(error, "error");
     });
 }
 
