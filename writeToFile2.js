@@ -22,9 +22,9 @@ async function listCaptionFinder(listOfIds) {
     const delay = ms => new Promise(res => setTimeout(res, ms));
     let promiseArray = [];
 
-    for (ID of listOfIds) {
+    for (Asset of listOfIds) {
         await delay(50);
-        promiseArray.push(hasCaptionsPromise(ID));
+        promiseArray.push(hasCaptionsPromise(Asset));
     }
 
     // for (ID of listOfIds) {
@@ -50,7 +50,7 @@ async function listCaptionFinder(listOfIds) {
 }
 
 
-function hasCaptionsPromise(id) {
+function hasCaptionsPromise(Asset) {
     return new Promise((resolve, reject) => {
         kaltura.services.session.start(
                 "6e2753acd5c56f7d5b7e41d711e27f1e",
@@ -63,7 +63,7 @@ function hasCaptionsPromise(id) {
                 let filter = new kaltura.objects.CaptionAssetItemFilter();
                 filter.formatEqual = kaltura.enums.CaptionType.SRT;
                 // Change Id here
-                filter.entryIdEqual = id;
+                filter.entryIdEqual = Asset.id;
                 let pager = new kaltura.objects.FilterPager();
 
                 kaltura.services.captionAsset.listAction(filter, pager)
@@ -72,10 +72,10 @@ function hasCaptionsPromise(id) {
                         resultStore = result;
                         console.log(result);
                         if (result.totalCount != 0) {
-                            let answer = { id: id, captions: true };
+                            let answer = { name: Asset.name, id: Asset.id, captions: true };
                             resolve(answer);
                         } else {
-                            let answer = { id: id, captions: false };
+                            let answer = { name: Asset.name, id: Asset.id, captions: false };
                             resolve(answer);
                         }
 
@@ -112,5 +112,9 @@ async function accessSpreadsheet() {
 }
 
 function getRow(row) {
-    idList.push(row.id);
+    let rowObject = {
+        name: row.content_name,
+        id: row.id
+    }
+    idList.push(rowObject);
 }
