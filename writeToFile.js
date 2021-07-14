@@ -18,28 +18,39 @@ accessSpreadsheet().then(() => {
     console.log("finished");
 });
 
-function listCaptionFinder(listOfIds) {
-    for (let i = 0; i < listOfIds.length; i++) {
-        hasCaptionsPromise(listOfIds[i]).then((message) => {
-            list.push({
-                id: message,
-                captions: true
-            });
-            fs.writeFile("output.txt", JSON.stringify(list), () => {});
-            //console.log(list);
-        }).catch((message) => {
-            list.push({
-                id: message,
-                captions: false
-            });
-            fs.writeFile("output.txt", JSON.stringify(list), () => {});
-            //console.log(list);
-        });
+async function listCaptionFinder(listOfIds) {
+    const delay = ms => new Promise(res => setTimeout(res, ms));
+    let promiseArray = [];
+
+    for (Asset of listOfIds) {
+        await delay(50);
+        promiseArray.push(hasCaptionsPromise(Asset));
     }
+
+    // for (ID of listOfIds) {
+    //     promiseArray.push(hasCaptionsPromise(ID));
+    // }
+
+    Promise.all(promiseArray).then((values) => {
+        console.log(values);
+        // Take list of returned objects and convert to string
+        let stringToWrite = JSON.stringify(values);
+        // Add a bit of formatting to match JSON format
+        stringToWrite = '{ "list":' + stringToWrite + "}";
+
+        fs.writeFile("output.json", stringToWrite, () => {});
+        
+        /* old ways of writing
+        fs.writeFile("output.txt", JSON.stringify(values), () => {});
+        fs.writeFile("output.txt", stringToWrite, () => {});
+        */
+    }).catch((error) => {
+        console.log(error, "error");
+    });
 }
 
 
-function hasCaptionsPromise(id) {
+function hasCaptionsPromise(Asset) {
     return new Promise((resolve, reject) => {
         kaltura.services.session.start(
                 "6e2753acd5c56f7d5b7e41d711e27f1e",
@@ -52,7 +63,7 @@ function hasCaptionsPromise(id) {
                 let filter = new kaltura.objects.CaptionAssetItemFilter();
                 filter.formatEqual = kaltura.enums.CaptionType.SRT;
                 // Change Id here
-                filter.entryIdEqual = id;
+                filter.entryIdEqual = Asset.id;
                 let pager = new kaltura.objects.FilterPager();
 
                 kaltura.services.captionAsset.listAction(filter, pager)
@@ -61,9 +72,11 @@ function hasCaptionsPromise(id) {
                         resultStore = result;
                         console.log(result);
                         if (result.totalCount != 0) {
-                            resolve(id);
+                            let answer = { name: Asset.name, id: Asset.id, captions: true };
+                            resolve(answer);
                         } else {
-                            reject(id);
+                            let answer = { name: Asset.name, id: Asset.id, captions: false };
+                            resolve(answer);
                         }
 
                         /*
@@ -99,5 +112,9 @@ async function accessSpreadsheet() {
 }
 
 function getRow(row) {
-    idList.push(row.id);
+    let rowObject = {
+        name: row.content_name,
+        id: row.id
+    }
+    idList.push(rowObject);
 }
