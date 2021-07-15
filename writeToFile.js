@@ -60,6 +60,9 @@ function hasCaptionsPromise(Asset) {
             .completion((success, ks) => {
                 if (!success) throw new Error(ks.message);
                 client.setKs(ks);
+                // Set filter and do kaltura.services.captionAssest.ListAction 
+                // Could maybe do the code here that loops through the whole id list
+                // without starting a new Kaltura session each time
                 let filter = new kaltura.objects.CaptionAssetItemFilter();
                 filter.formatEqual = kaltura.enums.CaptionType.SRT;
                 // Change Id here
