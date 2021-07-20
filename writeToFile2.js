@@ -53,6 +53,7 @@ async function listCaptionFinder(listOfIds) {
 
             }).catch((error) => {
                 console.log(error, "error");
+                fs.writeFile("output.txt", "error", () => {});
             });
         })
         .execute(client);
