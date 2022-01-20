@@ -1,3 +1,5 @@
+// Prints out some basic data from output.json
+
 const fs = require('fs');
 let captionTrue = 0;
 let captionFalse = 0;

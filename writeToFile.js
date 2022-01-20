@@ -1,3 +1,5 @@
+// Pulls kaltura entries from "Scratch" google sheet and writes whether each entry has captions or not to a .json file (output.json)
+
 const fs = require("fs");
 const kaltura = require("kaltura-client");
 // Kaltura

@@ -1,3 +1,5 @@
+// using setInterval, iteritively goes through the kalura entries google sheet and checks each entry for captions
+
 const kaltura = require('kaltura-client');
 // Kaltura
 const config = new kaltura.Configuration();

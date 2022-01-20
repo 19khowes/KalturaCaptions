@@ -1,3 +1,5 @@
+// Used to convert a .json file to a .csv file
+
 const fs = require('fs');
 
 loadData();
