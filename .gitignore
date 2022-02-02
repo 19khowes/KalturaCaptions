@@ -4,3 +4,4 @@ node_modules
 output.txt
 output.json
 output.csv
+client_secret.json
