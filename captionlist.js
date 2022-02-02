@@ -1,3 +1,5 @@
+// Finds whether a given kalutra entry (in idList) has captions or not, and prints out in .json format
+
 const kaltura = require('kaltura-client');
 const config = new kaltura.Configuration();
 config.serviceUrl = 'https://www.kaltura.com';

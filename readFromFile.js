@@ -1,3 +1,5 @@
+// supposed to be used to read from json file and put data back to google sheet
+
 const {
     GoogleSpreadsheet
 } = require('google-spreadsheet');
