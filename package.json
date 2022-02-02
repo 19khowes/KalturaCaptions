@@ -1,0 +1,24 @@
+{
+  "name": "KalturaCaptions",
+  "version": "1.0.0",
+  "description": "A repo for attemping to pull a true false value for a list of Kaltura media (by ID)",
+  "main": "captionlist.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/19khowes/KalturaCaptions.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/19khowes/KalturaCaptions/issues"
+  },
+  "homepage": "https://github.com/19khowes/KalturaCaptions#readme",
+  "dependencies": {
+    "google-spreadsheet": "^3.1.15",
+    "kaltura-client": "^17.5.0"
+  }
+}
