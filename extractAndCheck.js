@@ -1,27 +1,19 @@
-// Pulls kaltura entries from "Scratch" google sheet and writes whether each entry has captions or not to a .json file (output.json)
-
+// Pulls kaltura entries from "test.csv" and writes whether each entry has captions or not to a .json file (output.json)
+require('dotenv').config()
 const fs = require("fs");
-const kaltura = require("kaltura-client");
+const prompt = require("prompt-sync")();
+const parse = require("csv-parse/sync");
 // Kaltura
+const kaltura = require("kaltura-client");
 const config = new kaltura.Configuration();
 config.serviceUrl = "https://www.kaltura.com";
 const client = new kaltura.Client(config);
 
-// Sheets
-const {
-    GoogleSpreadsheet
-} = require("google-spreadsheet");
-const {
-    promisify
-} = require("util");
-const creds = require("./client_secret.json");
-
 let idList = [];
 let list = [];
 let resultStore;
-
 accessSpreadsheet().then(() => {
-    console.log("finished");
+    console.log("finished reading in file");
 });
 
 async function listCaptionFinder(listOfIds) {
@@ -32,20 +24,20 @@ async function listCaptionFinder(listOfIds) {
         await delay(50);
         promiseArray.push(hasCaptionsPromise(Asset));
     }
-
-    // for (ID of listOfIds) {
-    //     promiseArray.push(hasCaptionsPromise(ID));
-    // }
-
+    
+    // when all kaltura info sessions are done
     Promise.all(promiseArray)
         .then((values) => {
             console.log(values);
+
             // Take list of returned objects and convert to string
             let stringToWrite = JSON.stringify(values);
             // Add a bit of formatting to match JSON format
             stringToWrite = '{ "list":' + stringToWrite + "}";
 
-            fs.writeFile("output.json", stringToWrite, () => {});
+            fs.writeFile("./output/output.json", stringToWrite, () => {
+                console.log("finished writing to json")
+            });
 
             // Manually converts JSON to CSV
             let fields = Object.keys(values[0]);
@@ -59,10 +51,10 @@ async function listCaptionFinder(listOfIds) {
             });
             csv.unshift(fields.join(","));
             csv = csv.join("\r\n");
-            console.log(csv);
+
             // write csv data to .csv file
-            fs.writeFile('output.csv', csv, 'utf8', () => {
-                console.log('done writing to csv');
+            fs.writeFile('./output/output.csv', csv, 'utf8', () => {
+                console.log('finished writing to csv');
             });
         })
         .catch((error) => {
@@ -74,8 +66,8 @@ function hasCaptionsPromise(Asset) {
     return new Promise((resolve, reject) => {
         kaltura.services.session
             .start(
-                "6e2753acd5c56f7d5b7e41d711e27f1e",
-                "captions@usu.edu",
+                process.env.API_KEY,
+                process.env.ACCOUNT,
                 kaltura.enums.SessionType.ADMIN,
                 1530551
             )
@@ -125,31 +117,57 @@ function hasCaptionsPromise(Asset) {
 }
 
 async function accessSpreadsheet() {
-    const doc = new GoogleSpreadsheet(
-        "1k22ZS17H9xcbmFZagpCPWEMEtQ9sPnyrUeMIt9DvExI"
-    );
-    await doc.useServiceAccountAuth(creds);
-    const info = await doc.getInfo();
-    const sheet = await doc.sheetsByIndex[0];
-    // console.log(`Title: ${sheet.title}, Rows: ${sheet.rowCount}`);
+    // ask user full name of .csv file
+    const filename = prompt('Full .csv filename: ').trim();
 
-    const rows = await sheet.getRows({
-        offset: 0,
-    });
+    // read in the list of ID's from the .csv file
+    const assetList = getListOfAssets(filename);
 
-    rows.forEach((row) => {
-        getRow(row);
-    });
-
-    listCaptionFinder(idList);
+    listCaptionFinder(assetList);
 }
 
-function getRow(row) {
-    let rowObject = {
-        courseid: row.course_id,
-        coursename: row.course_name,
-        name: row.content_name,
-        id: row.id,
-    };
-    idList.push(rowObject);
+function getListOfAssets(filename) {
+    // read in file as a string
+    const stringCSV = fs.readFileSync(filename).toString();
+
+    // get as a multidimensional array
+    const fullCSV = parse.parse(stringCSV, {
+        colums: true,
+        skip_empty_lines: true
+    });
+
+    // change to each entry in multidimensional containing objects with course attributes
+    const rowAssets = fullCSV.map(rec => {
+        const idArray = rec[11].match(/\d_\w{8}/g);
+        if (idArray != null) {
+            const assetArray = [];
+            for (courseEntry of idArray) {
+                assetArray.push({
+                    courseid: rec[0],
+                    coursename: rec[1],
+                    name: rec[3],
+                    id: courseEntry
+                });
+            }
+            return assetArray;
+        }
+        return null;
+    });
+
+    // clear out null rows (without an entry id)
+    for (let i = rowAssets.length; i >= 0; i--) {
+        if (rowAssets[i] == null) {
+            rowAssets.splice(i, 1);
+        }
+    }
+
+    // flatten to a single dimensional array
+    const assets = [];
+    for (row of rowAssets) {
+        for (asset of row) {
+            assets.push(asset);
+        }
+    }
+
+    return assets;
 }

@@ -5,3 +5,5 @@ output.txt
 output.json
 output.csv
 client_secret.json
+file.csv
+.env

@@ -18,7 +18,10 @@
   },
   "homepage": "https://github.com/19khowes/KalturaCaptions#readme",
   "dependencies": {
+    "csv-parse": "^5.0.4",
+    "dotenv": "^16.0.0",
     "google-spreadsheet": "^3.1.15",
-    "kaltura-client": "^17.5.0"
+    "kaltura-client": "^17.5.0",
+    "prompt-sync": "^4.2.0"
   }
 }
