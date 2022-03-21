@@ -14,7 +14,7 @@ let list = [];
 let resultStore;
 
 accessSpreadsheet().then(() => {
-    console.log("finished");
+    console.log("finished reading in file");
 });
 
 async function listCaptionFinder(listOfIds) {
@@ -25,11 +25,8 @@ async function listCaptionFinder(listOfIds) {
         await delay(50);
         promiseArray.push(hasCaptionsPromise(Asset));
     }
-
-    // for (ID of listOfIds) {
-    //     promiseArray.push(hasCaptionsPromise(ID));
-    // }
-
+    
+    // when all kaltura info sessions are done
     Promise.all(promiseArray)
         .then((values) => {
             console.log(values);
@@ -38,7 +35,9 @@ async function listCaptionFinder(listOfIds) {
             // Add a bit of formatting to match JSON format
             stringToWrite = '{ "list":' + stringToWrite + "}";
 
-            fs.writeFile("output.json", stringToWrite, () => {});
+            fs.writeFile("output.json", stringToWrite, () => {
+                console.log("finished writing to json")
+            });
 
             // Manually converts JSON to CSV
             let fields = Object.keys(values[0]);
@@ -52,10 +51,10 @@ async function listCaptionFinder(listOfIds) {
             });
             csv.unshift(fields.join(","));
             csv = csv.join("\r\n");
-            console.log(csv);
+            // console.log(csv);
             // write csv data to .csv file
             fs.writeFile('output.csv', csv, 'utf8', () => {
-                console.log('done writing to csv');
+                console.log('finished writing to csv');
             });
         })
         .catch((error) => {
@@ -123,7 +122,6 @@ async function accessSpreadsheet() {
 
     // read in the list of ID's from the .csv file
     const assetList = getListOfAssets(filename);
-    console.log(assetList);
 
     listCaptionFinder(assetList);
 }
