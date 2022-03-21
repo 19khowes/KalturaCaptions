@@ -120,22 +120,56 @@ function hasCaptionsPromise(Asset) {
 async function accessSpreadsheet() {
     // ask user full name of .csv file
     const filename = prompt('Full .csv filename: ').trim();
-    let column = prompt('Which Column "Entry Ids" are in (A-Z): ').trim();
-    // convert column char to number (A->0, B->1, C->2, etc...)
-    column = column.charCodeAt() - 65;
-    console.log(column);
 
     // read in the list of ID's from the .csv file
+    const assetList = getListOfAssets(filename);
+    console.log(assetList);
+
+    listCaptionFinder(assetList);
+}
+
+function getListOfAssets(filename) {
+    // read in file as a string
     const stringCSV = fs.readFileSync(filename).toString();
 
-    const records = parse.parse(stringCSV, {
+    // get as a multidimensional array
+    const fullCSV = parse.parse(stringCSV, {
         colums: true,
         skip_empty_lines: true
     });
 
-    console.log(records);
+    // change to each entry in multidimensional containing objects with course attributes
+    const rowAssets = fullCSV.map(rec => {
+        const idArray = rec[11].match(/\d_\w{8}/g);
+        if (idArray != null) {
+            const assetArray = [];
+            for (courseEntry of idArray) {
+                assetArray.push({
+                    courseid: rec[0],
+                    coursename: rec[1],
+                    name: rec[3],
+                    id: courseEntry
+                });
+            }
+            return assetArray;
+        }
+        return null;
+    });
 
-    const columnX = records.map(rec => rec["Entry Ids"]);
-    console.log(columnX);
-    //listCaptionFinder(idList);
+    // clear out null rows (without an entry id)
+    for (let i = rowAssets.length; i >= 0; i--) {
+        if (rowAssets[i] == null) {
+            rowAssets.splice(i, 1);
+        }
+    }
+
+    // flatten to a single dimensional array
+    const assets = [];
+    for (row of rowAssets) {
+        for (asset of row) {
+            assets.push(asset);
+        }
+    }
+
+    return assets;
 }
