@@ -1,5 +1,5 @@
 // Pulls kaltura entries from "test.csv" and writes whether each entry has captions or not to a .json file (output.json)
-
+require('dotenv').config()
 const fs = require("fs");
 const prompt = require("prompt-sync")();
 const parse = require("csv-parse/sync");
@@ -12,7 +12,6 @@ const client = new kaltura.Client(config);
 let idList = [];
 let list = [];
 let resultStore;
-
 accessSpreadsheet().then(() => {
     console.log("finished reading in file");
 });
@@ -67,8 +66,8 @@ function hasCaptionsPromise(Asset) {
     return new Promise((resolve, reject) => {
         kaltura.services.session
             .start(
-                "6e2753acd5c56f7d5b7e41d711e27f1e",
-                "captions@usu.edu",
+                process.env.API_KEY,
+                process.env.ACCOUNT,
                 kaltura.enums.SessionType.ADMIN,
                 1530551
             )
