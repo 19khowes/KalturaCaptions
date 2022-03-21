@@ -30,12 +30,13 @@ async function listCaptionFinder(listOfIds) {
     Promise.all(promiseArray)
         .then((values) => {
             console.log(values);
+
             // Take list of returned objects and convert to string
             let stringToWrite = JSON.stringify(values);
             // Add a bit of formatting to match JSON format
             stringToWrite = '{ "list":' + stringToWrite + "}";
 
-            fs.writeFile("output.json", stringToWrite, () => {
+            fs.writeFile("./output/output.json", stringToWrite, () => {
                 console.log("finished writing to json")
             });
 
@@ -51,9 +52,9 @@ async function listCaptionFinder(listOfIds) {
             });
             csv.unshift(fields.join(","));
             csv = csv.join("\r\n");
-            // console.log(csv);
+
             // write csv data to .csv file
-            fs.writeFile('output.csv', csv, 'utf8', () => {
+            fs.writeFile('./output/output.csv', csv, 'utf8', () => {
                 console.log('finished writing to csv');
             });
         })
