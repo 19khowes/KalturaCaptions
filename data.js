@@ -10,7 +10,7 @@ let dataArray;
 loadData();
 
 function loadData() {
-    fs.readFile('./output.json', 'utf8', printData);
+    fs.readFile('./output/output.json', 'utf8', printData);
 }
 
 function printData(error, response) {
