@@ -9,6 +9,15 @@ const config = new kaltura.Configuration();
 config.serviceUrl = "https://www.kaltura.com";
 const client = new kaltura.Client(config);
 
+/* CHANGE NUMBERS TO MATCH DATA FORMAT*/
+
+const courseIDColumn = 0; // DEFAULT is A -> 0
+const courseNameColumn = 1; // DEFAULT is B -> 1
+const contentNameColumn = 3; // DEFAULT is D -> 3
+const entryIDColumn = 11; // DEFAULT is L -> 11
+
+/**************************************/
+
 let idList = [];
 let list = [];
 let resultStore;
@@ -138,14 +147,14 @@ function getListOfAssets(filename) {
 
     // change to each entry in multidimensional containing objects with course attributes
     const rowAssets = fullCSV.map(rec => {
-        const idArray = rec[11].match(/\d_\w{8}/g);
+        const idArray = rec[entryIDColumn].match(/\d_\w{8}/g);
         if (idArray != null) {
             const assetArray = [];
             for (courseEntry of idArray) {
                 assetArray.push({
-                    courseid: rec[0],
-                    coursename: rec[1],
-                    name: rec[3],
+                    courseid: rec[courseIDColumn],
+                    coursename: rec[courseNameColumn],
+                    name: rec[contentNameColumn],
                     id: courseEntry
                 });
             }
