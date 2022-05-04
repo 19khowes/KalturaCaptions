@@ -10,5 +10,5 @@ For use with Kaltura media inside of Canvas Instructure
 6. Results will be stored in two formats: .json and .csv, which will be located in the /output directory
 
 ## Data
-For data about the data that was returned, simply run `data.js`
+For data about the information that was returned, simply run `node data.js`
 
